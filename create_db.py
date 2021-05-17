@@ -1,7 +1,7 @@
 from psycopg2 import connect, OperationalError
 from psycopg2.errors import DuplicateDatabase, DuplicateTable
 
-"""Program makes database (db name input by user) and tables for users and messages"""
+"""Program to create database (db name input by user) and tables for users and messages"""
 
 db_name = input("Name your database: ")
 user_table_name = 'users'

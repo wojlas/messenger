@@ -1,8 +1,19 @@
 import hashlib
 import random
 
-import alphabet as alphabet
+def generate_salt():
+    """
+    Generates a 16-character random salt.
 
+    :rtype: str
+    :return: str with generated salt
+    """
+    salt = ""
+    for i in range(0, 16):
+
+        # get a random element from the iterable
+        salt += random.choice('abcdefghijklmnoprstwz')
+    return salt
 
 def hash_password(password, salt=None):
     """
@@ -23,13 +34,13 @@ def hash_password(password, salt=None):
     if salt is None:
         salt = generate_salt()
 
-    # fill to 16 chars if too short
-    if len(salt) < 16:
-        salt += ("a" * (16 - len(salt)))
-
-    # cut to 16 if too long
-    if len(salt) > 16:
-        salt = salt[:16]
+    # # fill to 16 chars if too short
+    # if len(salt) < 16:
+    #     salt += ("a" * (16 - len(salt)))
+    #
+    # # cut to 16 if too long
+    # if len(salt) > 16:
+    #     salt = salt[:16]
 
     # use sha256 algorithm to generate hash
     t_sha = hashlib.sha256()
@@ -40,7 +51,6 @@ def hash_password(password, salt=None):
 
     # return salt & hash joined
     return salt + t_sha.hexdigest()
-
 
 def check_password(pass_to_check, hashed):
     """
@@ -71,16 +81,4 @@ def check_password(pass_to_check, hashed):
     # compare hashes. If equal, return True
     return new_hash[16:] == hash_to_check
 
-# def generate_salt():
-#     """
-#     Generates a 16-character random salt.
-#
-#     :rtype: str
-#     :return: str with generated salt
-#     """
-#     salt = ""
-#     for i in range(0, 16):
-#
-#         # get a random element from the iterable
-#         salt += random.choice(ALPHABET)
-#     return salt
+
