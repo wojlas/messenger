@@ -3,7 +3,7 @@ import re
 from psycopg2 import connect, OperationalError
 from psycopg2.errors import DuplicateDatabase, DuplicateTable
 
-"""Program to create database (db name input by user) and tables for users and messages"""
+'''Program to create database (db name input by user) and tables for users and messages'''
 
 # db_name = input("Enter name of database: ")
 db_name = 'messenger_db'
@@ -33,7 +33,7 @@ db_user = "postgres"
 db_password = "coderslab"
 host = "127.0.0.1"
 
-#create database
+
 def execute_sql(sql_code, db_name):
     """
     Run given sql code with psycopg2.
@@ -59,6 +59,11 @@ def execute_sql(sql_code, db_name):
     return result
 
 def create_db():
+    '''database creation function
+
+    use function execute_sql to connect witch psql
+    if database are created successfully print Database created
+    if database already exist, print appropriate text'''
     try:
         execute_sql(sql_code= f"create database {db_name};",
                     db_name='')
@@ -68,8 +73,9 @@ def create_db():
         pass
 
 
-#create table users in database
+
 def create_users_table():
+    # create table users in database
     try:
         execute_sql(sql_code= create_users,
                     db_name=db_name)
@@ -77,8 +83,9 @@ def create_users_table():
     except DuplicateTable:
         return "Table Users already exist"
 
-#create table messages in database
+
 def create_messages_table():
+    # create table messages in database
     try:
         execute_sql(sql_code=create_messages,
                     db_name=db_name)

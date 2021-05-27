@@ -3,6 +3,9 @@ from hash_password import hash_password
 
 
 class Users():
+    '''class serving the user
+
+    the entered password is secured'''
     def __init__(self, username, password="", salt=None):
         self._id = -1
         self.username = username
@@ -25,10 +28,10 @@ class Users():
 
     def save_to_db(self):
         if self._id == -1:
-            execute_sql(
+            data = execute_sql(
                 sql_code=f"insert into users(username, hashed_password) values ('{self.username}','{self.hashed_password}') returning id",
                 db_name='messenger_db')
-            self._id = cursor.fetchone()[0]
+            self._id = data[0]
             return True
         else:
             sql = '''UPDATE Users SET username=%s, hashed_password=%sWHERE id=%s'''
@@ -39,47 +42,45 @@ class Users():
 
     @staticmethod
     def load_user_by_id(id_):
-        execute_sql(sql_code=f"select id, username, hashed_password from users where id = {id_};",
+        data = execute_sql(sql_code=f"select id, username, hashed_password from users where id = {id_};",
                     db_name='messenger_db')
-        data = cursor.fetchone()
         if data:
-            id_, username, hashed_password = data
+            id_, username, hashed_password = data[0]
             loaded_user = Users(username)
             loaded_user._id = id_
             loaded_user._hashed_password = hashed_password
-            return loaded_user.username
+            return loaded_user._id, loaded_user.username
         else:
             return None
 
     @staticmethod
-    def load_user_by_username(username, cursor):
-        execute_sql(sql_code=f"select id, username, hashed_password from users where username = {username};",
+    def load_user_by_username(username):
+        data = execute_sql(sql_code=f"select id, username, hashed_password from users where username = '{username}';",
                     db_name='messenger_db')
-        data = cursor.fetchone()
         if data:
-            id_, username, hashed_password = data
+            id_, username, hashed_password = data[0]
             loaded_user = Users(username)
             loaded_user._id = id_
             loaded_user._hashed_password = hashed_password
-            return loaded_user
+            return loaded_user._id, loaded_user.username
         else:
             return None
 
     @staticmethod
-    def load_all_users(cursor):
-        execute_sql(sql_code='select * from users;',
+    def load_all_users():
+        data = execute_sql(sql_code='select * from users;',
                     db_name='messenger_db')
         users = []
-        for row in cursor.fetchall():
+        for row in data:
             id_, username, hashed_password = row
-            loaded_user = Users()
+            loaded_user = Users
             loaded_user._id = id_
             loaded_user.username = username
             loaded_user._hashed_password = hashed_password
-            users.append(loaded_user)
+            users.append(loaded_user.username)
         return users
 
-    def delete_user(self, cursor):
+    def delete_user(self):
         execute_sql(sql_code=f'delete from users where id = {self._id}',
                     db_name='messenger_db')
         self._id = -1
@@ -100,25 +101,24 @@ class Messages:
 
     def save_to_db(self):
         if self._id == -1:
-            execute_sql(
+            data = execute_sql(
                 sql_code=f"insert into messages(from_id, to_id, text) values ('{self.from_id}','{self.to_id}', '{self.text}') returning id",
                 db_name='messenger_db')
-            self._id = cursor.fetchone()[0]
+            self._id = data
             return True
         else:
             sql = '''UPDATE messages SET from_id=%s, to_id=%s, text=%s WHERE id=%s'''
             values = (self.from_id, self.to_id, self.text, self.id)
-            execute_sql(sql_code=sql,
+            execute_sql(sql_code=(sql, values),
                         db_name='messenger_db')
-            cursor.execute(sql, values)
             return True
 
     @staticmethod
-    def load_all_messages(cursor):
-        execute_sql(sql_code='select * from messages;',
+    def load_all_messages(creation_data=None):
+        data = execute_sql(sql_code='select * from messages;',
                     db_name='messenger_db')
         messages = []
-        for row in cursor.fetchall():
+        for row in data:
             id_, from_id, to_id, text = row
             load_messages = Messages()
             load_messages._id = id_
@@ -133,5 +133,9 @@ class Messages:
 if __name__=='__main__':
     user = Users(username='Ola', password='test123')
     # user.save_to_db()
-    # user.load_user_by_id(3)
-    # user.load_all_users()
+    # print(user.load_user_by_id(3))
+    # print(user.load_all_users())
+    # print(user.load_user_by_username('Wojtek'))
+
+    # messages = Messages
+    # messages.save_to_db()

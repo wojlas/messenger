@@ -14,12 +14,16 @@ parser.add_argument("-e", "--edit", help="edit user", action="store_true")
 
 args = parser.parse_args()
 
-def list_users(cur):
-    users = Users.load_all_users(cur)
+def list_users(data):
+    '''function load all user from database'''
+    users = Users.load_all_users(data)
     for user in users:
         print(user.username)
 
-def create_user(cur, username, password):
+def create_user(data, username, password):
+    '''function create new user
+
+    password must be longer than 8 characters'''
     if len(password) < 8:
         print("Password is tho short. It should have minimum 8 characters.")
     else:
@@ -30,18 +34,22 @@ def create_user(cur, username, password):
         except UniqueViolation as e:
             print("User already exist", e)
 
-def delete_user(cur, username, password):
-    user = Users.load_user_by_username(cur, username)
+def delete_user(data, username, password):
+    '''function deleted user from database'''
+    user = Users.load_user_by_username(data, username)
     if not user:
         print("User doesn't exist!")
     elif check_password(password, user.hashed_password):
-        user.delete(cur)
+        user.delete(data)
         print("User deleted.")
     else:
         print("Incorrect password!")
 
-def edit_user(cur, username, password, new_pass):
-    user = Users.load_user_by_username(cur, username)
+def edit_user(data, username, password, new_pass):
+    '''function edited user in database
+
+    function checks if user in database and change his password'''
+    user = Users.load_user_by_username(data, username)
     if not user:
         print("User does not exist!")
     elif check_password(password, user.hashed_password):
@@ -49,12 +57,13 @@ def edit_user(cur, username, password, new_pass):
             print("Password is tho short. It should have minimum 8 characters.")
         else:
             user.hashed_password = new_pass
-            user.save_to_db(cur)
+            user.save_to_db(data)
             print("Password changed.")
     else:
         print("Incorrect password")
 
 if __name__=='__main__':
+    #connect and communicate with database by argpars
     try:
         cnx = connect(database="messenger_db", user="postgres", password="coderslab", host="127.0.0.1")
         cnx.autocommit = True
